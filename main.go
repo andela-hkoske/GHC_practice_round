@@ -18,6 +18,12 @@ type (
 		Raw                             string
 		Arrangement                     [][]string
 	}
+
+	C [2]int
+
+	Slice struct {
+		Start, Stop C
+	}
 )
 
 func main() {
