@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -33,20 +32,18 @@ func main() {
 	)
 	p.Raw, err = ReadInput("./example.in")
 	if err != nil {
-		goto ERROR
+		fmt.Println(err)
+		return
 	}
 	err = p.ParseRaw()
 	if err != nil {
-		goto ERROR
+		fmt.Println(err)
+		return
 	}
 	p.SetTomatoes()
 	p.SetMushrooms()
 	p.SetArrangement()
-	log.Printf("%+v\n", p)
-	log.Println(p.isSlice(Slice{C{0, 0}, C{1, 2}}))
-ERROR:
-	log.Println(err)
-	return
+	fmt.Println(p.GetFirstSlices(C{1, 0}))
 }
 
 func ReadInput(filename string) (string, error) {
@@ -106,24 +103,38 @@ func (p *Pizza) SetArrangement() {
 	}
 }
 
-func (p *Pizza) GetFirstSlices() Slice {
-	var tempSlice Slice
-	col, colVal := 0, ""
-	for row, rowVal := range p.Arrangement {
-		for col, colVal = range rowVal {
-			tempSlice = Slice{C{row, 0}, C{row, col}}
-			p.isSlice(tempSlice)
+func (p *Pizza) GetFirstSlices(start C) []Slice {
+	var (
+		tempSlice   Slice
+		validSlices []Slice
+		col, row    int = start[1], start[0]
+	)
+	lenRows, rowLen, rowVal := 0, 0, []string{}
+	for lenRows = len(p.Arrangement); row < lenRows; row++ {
+		rowVal = p.Arrangement[row]
+		rowLen = len(rowVal)
+		if (((col - start[1]) + 1) * ((row - start[0]) + 1)) > p.MaxCells {
+			break
 		}
+		for col = start[1]; col < rowLen; col++ {
+			if (((col - start[1]) + 1) * ((row - start[0]) + 1)) > p.MaxCells {
+				break
+			}
+			tempSlice = Slice{start, C{row, col}}
+			if p.isSlice(tempSlice) {
+				validSlices = append(validSlices, tempSlice)
+			}
+		}
+		col = start[1]
 	}
+	return validSlices
 }
 
 func (p *Pizza) isSlice(sl Slice) bool {
 	var vals string
-	for i, lastRow := 0, sl.Stop[0]; i <= lastRow; i++ {
-		// log.Println(p.Arrangement[i][:sl.Stop[1]+1])
-		vals = vals + strings.Join(p.Arrangement[i][:sl.Stop[1]+1], "")
+	for i, lastRow := sl.Start[0], sl.Stop[0]; i <= lastRow; i++ {
+		vals = vals + strings.Join(p.Arrangement[i][sl.Start[1]:sl.Stop[1]+1], "")
 	}
-	// log.Println(vals)
 	if strings.Count(vals, "T") >= p.MinIng && strings.Count(vals, "M") >= p.MinIng {
 		return true
 	}
