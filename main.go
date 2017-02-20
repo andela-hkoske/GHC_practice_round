@@ -43,7 +43,7 @@ func main() {
 	p.SetTomatoes()
 	p.SetMushrooms()
 	p.SetArrangement()
-	fmt.Println(p.GetFirstSlices(C{1, 0}))
+	fmt.Println(p.GetViableSlices(C{1, 0}))
 }
 
 func ReadInput(filename string) (string, error) {
@@ -103,7 +103,7 @@ func (p *Pizza) SetArrangement() {
 	}
 }
 
-func (p *Pizza) GetFirstSlices(start C) []Slice {
+func (p *Pizza) GetViableSlices(start C) []Slice {
 	var (
 		tempSlice   Slice
 		validSlices []Slice
