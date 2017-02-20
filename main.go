@@ -25,29 +25,34 @@ type (
 	}
 )
 
-func init(){
-	fmt.Println(os.Args)
+var (
+	testPizza = &Pizza{}
+	testErr error
+)
+
+func init() {
+	args := os.Args
+	if len(args) < 2 {
+		panic(errors.New("You need to pass the full path of the input file"))
+	}
+	file := strings.TrimSpace(args[1])
+	testPizza.Raw, testErr = ReadInput(file)
+	if testErr != nil {
+		fmt.Println(testErr)
+		return
+	}
+	testErr = testPizza.ParseRaw()
+	if testErr != nil {
+		fmt.Println(testErr)
+		return
+	}
+	testPizza.SetTomatoes()
+	testPizza.SetMushrooms()
+	testPizza.SetArrangement()
 }
 
 func main() {
-	var (
-		p   = &Pizza{}
-		err error
-	)
-	p.Raw, err = ReadInput("./example.in")
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = p.ParseRaw()
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	p.SetTomatoes()
-	p.SetMushrooms()
-	p.SetArrangement()
-	fmt.Println(p.GetViableSlices(C{1, 0}))
+	fmt.Println(testPizza.GetViableSlices(C{1, 0}))
 }
 
 // ReadInput reads the input file
@@ -105,7 +110,7 @@ func (p *Pizza) SetMushrooms() {
 	p.Mushrooms = strings.Count(p.Raw, "M")
 }
 
-// SetArrangement parses the input file and maps the pizza into a two 
+// SetArrangement parses the input file and maps the pizza into a two
 // dimensional array set to its Arrangement property
 func (p *Pizza) SetArrangement() {
 	ing := p.Raw[8:]
