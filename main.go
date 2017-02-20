@@ -43,6 +43,7 @@ func main() {
 	p.SetMushrooms()
 	p.SetArrangement()
 	log.Printf("%+v\n", p)
+	log.Println(p.isSlice(Slice{C{0, 0}, C{1, 2}}))
 ERROR:
 	log.Println(err)
 	return
@@ -103,4 +104,28 @@ func (p *Pizza) SetArrangement() {
 	for pos, row := range tempRows {
 		p.Arrangement[pos] = strings.Split(row, "")
 	}
+}
+
+func (p *Pizza) GetFirstSlices() Slice {
+	var tempSlice Slice
+	col, colVal := 0, ""
+	for row, rowVal := range p.Arrangement {
+		for col, colVal = range rowVal {
+			tempSlice = Slice{C{row, 0}, C{row, col}}
+			p.isSlice(tempSlice)
+		}
+	}
+}
+
+func (p *Pizza) isSlice(sl Slice) bool {
+	var vals string
+	for i, lastRow := 0, sl.Stop[0]; i <= lastRow; i++ {
+		// log.Println(p.Arrangement[i][:sl.Stop[1]+1])
+		vals = vals + strings.Join(p.Arrangement[i][:sl.Stop[1]+1], "")
+	}
+	// log.Println(vals)
+	if strings.Count(vals, "T") >= p.MinIng && strings.Count(vals, "M") >= p.MinIng {
+		return true
+	}
+	return false
 }
