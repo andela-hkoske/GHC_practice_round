@@ -23,6 +23,10 @@ type (
 	Slice struct {
 		Start, Stop C
 	}
+	Tree struct{
+		Node Slice
+		SubTrees []*Tree
+	}
 )
 
 var (
@@ -52,7 +56,8 @@ func init() {
 }
 
 func main() {
-	fmt.Println(testPizza.GetViableSlices(C{1, 0}))
+	// fmt.Println(testPizza.GetViableSlices(C{1, 0}))
+	fmt.Println(testPizza.traverse())
 }
 
 // ReadInput reads the input file
@@ -158,4 +163,14 @@ func (p *Pizza) isSlice(sl Slice) bool {
 		return true
 	}
 	return false
+}
+
+// traverse returns a tree of all viable pizza slices
+func (p *Pizza) traverse() *Tree{
+	options := &Tree{}
+	tempSlices := p.GetViableSlices(C{0, 0})
+	for _, slice := range tempSlices{
+		options.SubTrees = append(options.SubTrees, &Tree{Node: slice})
+	}
+	return options
 }
